@@ -112,16 +112,17 @@ class MessageDAO:
         pass
 
     @staticmethod
-    async def save(content: str, user_id: int, message_tg_id: int, from_bot: bool) -> bool:
+    async def save(content: str, user_id: int, user_tg_id: str, message_tg_id: int, from_bot: bool) -> bool:
         async with connect_database() as session:
             try:
                 statement = insert(Message).values(
                     user_id=user_id,
+                    user_tg_id=user_tg_id,
                     message_tg_id=message_tg_id,
                     content=content,
                     from_bot=from_bot
                 ).on_conflict_do_nothing(
-                    index_elements=['user_id', 'message_tg_id']
+                    index_elements=['user_tg_id', 'message_tg_id']
                 ).returning(Message.id)
                 
                 await session.execute(statement)

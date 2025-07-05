@@ -36,18 +36,12 @@ def convert_markdown_bold_to_html(text: str) -> str:
     first_iteration = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', text)
     return re.sub(r'\*(.+?)\*', r'<b>\1</b>', first_iteration)
 
-photo_url_pattern = r'(/static/\S+\.(?:jpg|jpeg|png|gif|webp))'
-
-def clean_text_from_photo_urls(text: str):
-    return re.sub(photo_url_pattern, '', text, flags=re.IGNORECASE).strip()
-
 
 async def answer_with_scribe(text: str, user: User, sent_photo_url: str | None):
-    formatted_text = clean_text_from_photo_urls(convert_markdown_bold_to_html(text))
-    msg = await bot.send_message(user.tg_id, formatted_text)
+    msg = await bot.send_message(user.tg_id, text)
 
     sent_text = text if sent_photo_url is None else f'{text}\n{sent_photo_url}'
-    await DAO.Message.save(sent_text, user.id, msg.message_id, True)
+    await DAO.Message.save(sent_text, user.id, user.tg_id, msg.message_id, True)
 
 
 async def safe_send_mediagroup(user_tg_id: str, media: list[InputMediaPhoto | InputMediaVideo], fallback_message: str | None):

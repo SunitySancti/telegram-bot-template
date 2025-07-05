@@ -1,9 +1,16 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
+from typing import Optional, Literal
 
 
 class Config(BaseSettings):
-    DEV: bool = True
+    ENV_MODE: Literal['dev', 'prod']
+    @property
+    def IS_DEV(self) -> bool:
+        return self.ENV_MODE == 'dev'
+    @property
+    def IS_PROD(self) -> bool:
+        return self.ENV_MODE == 'prod'
+    
     LOG_BLOCK_WIDTH: int = 100
 
     TELEGRAM_BOT_HOST: str
@@ -15,12 +22,12 @@ class Config(BaseSettings):
 
     POSTGRES_HOST: str
     POSTGRES_PORT: int
-    POSTGRES_NAME: str
-    POSTGRES_USERNAME: str
+    POSTGRES_DB: str
+    POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     @property
     def DB_URL(self) -> str:
-        return f'postgresql+asyncpg://{self.POSTGRES_USERNAME}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_NAME}'
+        return f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'
 
     CLOUDPAYMENTS_PUBLIC_ID: Optional[str] = None
     CLOUDPAYMENTS_API_SECRET: Optional[str] = None

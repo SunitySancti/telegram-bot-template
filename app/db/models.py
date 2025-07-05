@@ -34,15 +34,16 @@ class Base(AsyncAttrs, DeclarativeBase):
 class Message(Base):
     __table_args__ = (
         Index('idx_user_id_created_at', 'user_id', text('created_at DESC')),
-        UniqueConstraint('user_id', 'message_tg_id', name='unique_user_message'),
+        UniqueConstraint('user_tg_id', 'message_tg_id', name='unique_user_message'),
     )
     user_id: Mapped[int] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'), index=True, nullable=False)
-    user_tg_id: Mapped[str] = mapped_column(ForeignKey('users.tg_id', ondelete='CASCADE'), index=True, nullable=False)
-    user = relationship('User', back_populates='messages')
-
+    user_tg_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
     message_tg_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+
     content: Mapped[str] = mapped_column(Text, nullable=False)
     from_bot: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+    user = relationship('User', back_populates='messages')
 
 
 class User(Base):

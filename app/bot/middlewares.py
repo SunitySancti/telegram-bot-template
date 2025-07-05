@@ -88,7 +88,7 @@ class ScribeInboundMiddleware(BaseMiddleware):
     ) -> Any:
         user = data['user']
         if isinstance(user, User) and isinstance(message, TelegramMessage):
-            inserted = await DAO.Message.save(message.text or '', user.id, message.message_id, False)
+            inserted = await DAO.Message.save(message.text or '', user.id, user.tg_id, message.message_id, False)
             if not inserted:
                 return None
         
