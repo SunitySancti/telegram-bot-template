@@ -1,0 +1,14 @@
+uvicorn
+fastapi
+aiogram
+python-dotenv
+pydantic
+pydantic_settings
+asyncpg
+sqlalchemy[asyncio]
+alembic
+psycopg2
+apscheduler
+requests
+python-multipart
+tenacity

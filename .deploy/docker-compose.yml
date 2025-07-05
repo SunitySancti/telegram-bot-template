@@ -1,0 +1,48 @@
+services:
+
+  db:
+    container_name: db
+    image: postgres:latest
+    env_file: ${ENV_FILE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    env_file: ${ENV_FILE}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  bot:
+    container_name: bot
+    build:
+      context: ..
+      dockerfile: .deploy/Dockerfile
+    env_file: ${ENV_FILE}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ..:/app # нужно для обновления с --reload
+      - ../static:/static
+    command: ["/bin/bash", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"]
+    depends_on:
+      - db
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - bot
+
+volumes:
+  postgres_data:
+    driver: local
